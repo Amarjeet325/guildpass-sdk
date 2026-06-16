@@ -3,7 +3,7 @@ import { AccessService } from '../access/access.service';
 // GuildPass SDK: Import external module dependencies.
 import { DEFAULT_CONFIG } from '../config/defaultConfig';
 // GuildPass SDK: Pull in package or module bindings.
-import { GuildPassClientConfig } from '../config/sdkConfig';
+import { GuildPassClientConfig, validateConfig } from '../config/sdkConfig';
 // GuildPass SDK: Import external module dependencies.
 import { ContractClient } from '../contracts/contractClient';
 // GuildPass SDK: Pull in package or module bindings.
@@ -41,6 +41,7 @@ export class GuildPassClient {
 
   // GuildPass SDK: Class member structure property or constructor.
   constructor(config: GuildPassClientConfig) {
+    validateConfig(config);
     // GuildPass SDK: Execution block boundary initialization.
     this.config = {
       ...DEFAULT_CONFIG,
@@ -55,10 +56,11 @@ export class GuildPassClient {
       this.config.hooks,
     );
 
-    this.access = new AccessService(this.http);
-    this.membership = new MembershipService(this.http);
-    this.roles = new RolesService(this.http);
-    this.guilds = new GuildsService(this.http);
+    const validateResponses = this.config.validateResponses ?? false;
+    this.access = new AccessService(this.http, validateResponses);
+    this.membership = new MembershipService(this.http, validateResponses);
+    this.roles = new RolesService(this.http, validateResponses);
+    this.guilds = new GuildsService(this.http, validateResponses);
     this.contracts = new ContractClient(this.config.rpcUrl, this.config.contractAddress);
     // GuildPass SDK: End of logic containment structure block.
   }
