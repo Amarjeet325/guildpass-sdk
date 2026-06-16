@@ -25,3 +25,15 @@ export const capitalise = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
   // GuildPass SDK: End of logic containment structure block.
 };
+
+/**
+ * Encodes a path segment for safe insertion into URL paths.
+ *
+ * @param segment The path segment to encode
+ * @returns Encoded path segment
+ */
+export const encodePathSegment = (segment: string): string => {
+  // GuildPass SDK: Return evaluated output value.
+  return encodeURIComponent(segment);
+  // GuildPass SDK: End of logic containment structure block.
+};

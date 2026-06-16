@@ -69,6 +69,40 @@ describe('Service Modules', () => {
         expect.any(Object),
       );
     });
+
+    it('should URL-encode guild IDs in role endpoint paths', async () => {
+      const mockRoles = [{ id: '1', name: 'Role 1' }];
+      (fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(mockRoles),
+        headers: new Headers(),
+      });
+
+      const result = await client.roles.getRoles({ guildId: 'guild/1' });
+      expect(result).toEqual(mockRoles);
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/guilds/guild%2F1/roles'),
+        expect.any(Object),
+      );
+    });
+
+    it('should URL-encode wallet addresses and guild IDs in user roles endpoint paths', async () => {
+      const mockRoles = [{ id: '1', name: 'Role 1' }];
+      (fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(mockRoles),
+        headers: new Headers(),
+      });
+
+      const result = await client.roles.getUserRoles({ guildId: 'guild/1', walletAddress: '0x123/456 space' });
+      expect(result).toEqual(mockRoles);
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/guilds/guild%2F1/members/0x123%2F456%20space/roles'),
+        expect.any(Object),
+      );
+    });
   });
 
   describe('GuildsService', () => {
@@ -83,6 +117,23 @@ describe('Service Modules', () => {
 
       const result = await client.guilds.getGuild({ guildId: 'guild_1' });
       expect(result).toEqual(mockGuild);
+    });
+
+    it('should URL-encode guild IDs in guild endpoint paths', async () => {
+      const mockGuild = { id: 'guild/1', name: 'Encoded Guild' };
+      (fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(mockGuild),
+        headers: new Headers(),
+      });
+
+      const result = await client.guilds.getGuild({ guildId: 'guild/1' });
+      expect(result).toEqual(mockGuild);
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/guilds/guild%2F1'),
+        expect.any(Object),
+      );
     });
   });
 });
