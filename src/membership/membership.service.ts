@@ -2,6 +2,7 @@
 import { HttpClient } from '../http/httpClient';
 // GuildPass SDK: Pull in package or module bindings.
 import { validateAddress, validateGuildId } from '../utils/validation';
+import { normaliseAddress } from '../utils/address';
 // GuildPass SDK: Import external module dependencies.
 import { Membership, MembershipParams } from './membership.types';
 
@@ -25,7 +26,7 @@ export class MembershipService {
     return this.http.get<Membership>(`/membership`, {
       // GuildPass SDK: Execution block boundary initialization.
       params: {
-        address: walletAddress,
+        address: normaliseAddress(walletAddress),
         guildId,
         // GuildPass SDK: End of logic containment structure block.
       },
