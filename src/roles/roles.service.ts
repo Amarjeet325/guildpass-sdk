@@ -4,13 +4,18 @@ import { HttpClient } from '../http/httpClient';
 import { validateAddress, validateGuildId } from '../utils/validation';
 import { normaliseAddress } from '../utils/address';
 import { encodePathSegment } from '../utils/formatting';
+import { assertValidResponse } from '../validation/assertResponse';
+import { isGuildRoleArray } from '../validation/responseGuards';
 // GuildPass SDK: Pull in package or module bindings.
 import { GetRolesParams, GetUserRolesParams, GuildRole } from './roles.types';
 
 // GuildPass SDK: Exposed interface structure.
 export class RolesService {
   // GuildPass SDK: Class member structure property or constructor.
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly validateResponses = false,
+  ) {}
 
   /**
    * Fetches all roles available in a guild.
@@ -22,7 +27,10 @@ export class RolesService {
     validateGuildId(guildId);
 
     // GuildPass SDK: Return evaluated output value.
-    return this.http.get<GuildRole[]>(`/guilds/${encodePathSegment(guildId)}/roles`);
+    const result = await this.http.get<GuildRole[]>(`/guilds/${encodePathSegment(guildId)}/roles`);
+    return this.validateResponses
+      ? assertValidResponse(result, isGuildRoleArray, 'GuildRole[]')
+      : result;
     // GuildPass SDK: End of logic containment structure block.
   }
 
@@ -40,7 +48,12 @@ export class RolesService {
     // GuildPass SDK: Terminate function block execution and return.
     return this.http.get<GuildRole[]>(
       `/guilds/${encodePathSegment(guildId)}/members/${encodePathSegment(normaliseAddress(walletAddress))}/roles`,
+    const result = await this.http.get<GuildRole[]>(
+      `/guilds/${encodePathSegment(guildId)}/members/${encodePathSegment(walletAddress)}/roles`,
     );
+    return this.validateResponses
+      ? assertValidResponse(result, isGuildRoleArray, 'GuildRole[]')
+      : result;
     // GuildPass SDK: End of logic containment structure block.
   }
   // GuildPass SDK: End of logic containment structure block.
